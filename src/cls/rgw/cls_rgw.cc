@@ -365,10 +365,10 @@ static int encode_list_index_key(cls_method_context_t hctx, const cls_rgw_obj_ke
 
   int ret = read_index_entry(hctx, obj_index_key, &entry);
   if (ret == -ENOENT) {
-   /* couldn't find the entry, set key value after the current object */
-    char buf[2] = { 0x1, 0 };
-    string s(buf);
-    *index_key  = key.name + s;
+    /* couldn't find the entry, set key value to the current object to avoid ommiting object versions */
+    string ver_delim("\0v", 2);
+    *index_key = key.name;
+    index_key->append(ver_delim);
     return 0;
   }
   if (ret < 0) {
